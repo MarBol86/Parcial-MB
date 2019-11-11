@@ -9,11 +9,6 @@ class LoginForm(FlaskForm):
     enviar = SubmitField('Ingresar')
 
 
-class SaludarForm(FlaskForm):
-    usuario = StringField('Nombre: ', validators=[Required()])
-    enviar = SubmitField('Saludar')
-
-
 class RegistrarForm(LoginForm):
     password_check = PasswordField('Verificar Contraseña', validators=[Required()])
     enviar = SubmitField('Registrarse')

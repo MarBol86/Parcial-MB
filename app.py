@@ -1,46 +1,29 @@
 #!/usr/bin/env python
 import csv
 from datetime import datetime
+# fecha_actual=datetime.utcnow()
 
 from flask import Flask, render_template, redirect, url_for, flash, session
 from flask_bootstrap import Bootstrap
 
-from forms import LoginForm, SaludarForm, RegistrarForm
+from forms import LoginForm, RegistrarForm
+import processing
 
 
 app = Flask(__name__)
 bootstrap = Bootstrap(app)
+
 
 app.config['SECRET_KEY'] = 'un string que funcione como llave'
 
 
 @app.route('/')
 def index():
-    return render_template('index.html', fecha_actual=datetime.utcnow())
+    return render_template('index.html')
 
-
-@app.route('/saludar', methods=['GET', 'POST'])
-def saludar():
-    formulario = SaludarForm()
-    if formulario.validate_on_submit():  # Acá hice el POST si es True
-        print(formulario.usuario.name)
-        return redirect(url_for('saludar_persona', usuario=formulario.usuario.data))
-    return render_template('saludar.html', form=formulario)
-
-
-@app.route('/saludar/<usuario>')
-def saludar_persona(usuario):
-    return render_template('usuarios.html', nombre=usuario)
-
-
-@app.errorhandler(404)
-def no_encontrado(e):
-    return render_template('404.html'), 404
-
-
-@app.errorhandler(500)
-def error_interno(e):
-    return render_template('500.html'), 500
+@app.route('/sobre')
+def sobre():
+    return render_template('sobre.html')
 
 
 @app.route('/ingresar', methods=['GET', 'POST'])
@@ -62,12 +45,27 @@ def ingresar():
     return render_template('login.html', formulario=formulario)
 
 
+@app.route('/clientes', methods=['GET']) #Muestra la tabla clientes
+def secreto():
+    if 'username' in session:
+        CantClientes = processing.contar()
+        lista = processing.tabular()
+        return render_template('clientes.html', CantClientes = CantClientes, lista = lista)
+    else:
+        flash('Primero debes ingresar.')
+        return redirect (url_for ("ingresar"))
+   
+
+# Se agrega una verificación para que no haya dos nombres de usuarios iguales
 @app.route('/registrar', methods=['GET', 'POST'])
 def registrar():
     formulario = RegistrarForm()
     if formulario.validate_on_submit():
+        if processing.existir(formulario.usuario.data):
+            flash('El nombre de usuario ya existe, eliga otro.') #
+            return render_template('registrar.html', formulario=formulario)
         if formulario.password.data == formulario.password_check.data:
-            with open('usuarios', 'a+') as archivo:
+            with open('usuarios', 'a+', newline='') as archivo:
                 archivo_csv = csv.writer(archivo)
                 registro = [formulario.usuario.data, formulario.password.data]
                 archivo_csv.writerow(registro)
@@ -75,15 +73,7 @@ def registrar():
             return redirect(url_for('ingresar'))
         else:
             flash('Las passwords no matchean')
-    return render_template('registrar.html', form=formulario)
-
-
-@app.route('/secret', methods=['GET'])
-def secreto():
-    if 'username' in session:
-        return render_template('private.html', username=session['username'])
-    else:
-        return render_template('sin_permiso.html')
+    return render_template('registrar.html', formulario=formulario)
 
 
 @app.route('/logout', methods=['GET'])
@@ -94,6 +84,22 @@ def logout():
     else:
         return redirect(url_for('index'))
 
+@app.errorhandler(404)
+def no_encontrado(e):
+    if 'username' in session:
+        return render_template('404.html'), 404
+    else:
+        flash('Probá ingresando primero, luego vemos.')
+        return redirect (url_for ("ingresar"))
+
+
+@app.errorhandler(500)
+def error_interno(e):
+    if 'username' in session:
+        return render_template('500.html'), 500
+    else:
+       flash('Probá ingresando primero, luego vemos.')
+       return redirect (url_for ("ingresar"))
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True)
+    app.run(debug=True)

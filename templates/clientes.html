@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Clientes{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>Clintes de Conesa Inc.</h1>
+</div>
+<p>En la base existen {{ CantClientes }} clientes.</p>
+
+<table class="table table-striped table-bordered table-hover table-condensed">
+        <thead>
+          <tr class="info">
+            <th>Nombre</th>
+            <th>Edad</th>
+            <th>Dirección</th>
+            <th>País</th>
+            <th>Documento</th>
+            <th>Fecha Alta</th>
+            <th>Correo Electrónico</th>
+            <th>Trabajo</th>
+          </tr>
+        </thead>
+        <tbody>
+{% for element in lista %}
+    <tr>
+        <td>{{ element.nombre }}</td>
+        <td>{{ element.edad }}</td>
+        <td>{{ element.direc }}</td>
+        <td>{{ element.país }}</td>
+        <td>{{ element.dni }}</td>
+        <td>{{ element.fechaAlta }}</td>
+        <td>{{ element.mail }}</td>
+        <td>{{ element.trabajo }}</td>        
+    </tr>
+{% endfor %}
+        </tbody>
+</table>
+{% endblock %}
+

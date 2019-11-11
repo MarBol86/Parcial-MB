@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Sobre{% endblock %}
+
+{% block page_content %}
+
+<div class="page-header">
+
+    <h1>Realizado por</h1>   
+</div>
+<p>Marilina Bolatti</p>
+<style>
+        img {
+            border:0;
+            margin-left: 0px;
+            width:25px;height:20px
+          }
+        </style>
+        
+<p><img src="/static/images/telegram.JPG" alt="logo" class = "fa"style= "width:25px;height:25px" > @MarBol</p>
+<p><img src="/static/images/gmail.JPG" alt="logo" class = "fa"> marilinabolatti@gmail.com  </p>
+<ul>
+    <li><b>Materia:</b> Paradigmas de Programación</li>
+    <li></p><b>Ciclo electivo:</b> 2019</li>
+</ul>
+{% endblock %}

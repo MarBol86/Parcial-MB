@@ -26,6 +26,11 @@
                 <li><a href="/sobre">Sobre</a></li>
                 {% if 'username' in session %}
                 <li><a href="/clientes">Clientes</a></li>
+                <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Consultas<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                      <li><a href="/search/clientes/country">Clientes por país</a></li>
+                    </ul>
+                </li>
                 {% endif %}
             </ul>
             <ul class="nav navbar-nav navbar-right">
@@ -52,6 +57,8 @@
     {% block page_content %}{% endblock %}
 </div>
 {% endblock %}
+
+
 
 {% block scripts %}
 {{ super() }}

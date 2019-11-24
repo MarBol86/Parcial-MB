@@ -6,7 +6,7 @@ from datetime import datetime
 from flask import Flask, render_template, redirect, url_for, flash, session
 from flask_bootstrap import Bootstrap
 
-from forms import LoginForm, RegistrarForm
+from forms import LoginForm, RegistrarForm, SearchCountry
 import processing
 
 
@@ -45,17 +45,6 @@ def ingresar():
     return render_template('login.html', formulario=formulario)
 
 
-@app.route('/clientes', methods=['GET']) #Muestra la tabla clientes
-def secreto():
-    if 'username' in session:
-        CantClientes = processing.contar()
-        lista = processing.tabular()
-        return render_template('clientes.html', CantClientes = CantClientes, lista = lista)
-    else:
-        flash('Primero debes ingresar.')
-        return redirect (url_for ("ingresar"))
-   
-
 # Se agrega una verificación para que no haya dos nombres de usuarios iguales
 @app.route('/registrar', methods=['GET', 'POST'])
 def registrar():
@@ -83,6 +72,47 @@ def logout():
         return render_template('logged_out.html')
     else:
         return redirect(url_for('index'))
+
+
+@app.route('/clientes', methods=['GET']) #Muestra la tabla clientes
+def secreto():
+    if 'username' in session:
+        filas = processing.createRows()
+        CantClientes = processing.contar(filas)
+        encabezados = processing.createHeaders()
+        return render_template('clientes.html', CantClientes = CantClientes, filas = filas, encabezados = encabezados)
+    else:
+        flash('Primero debes ingresar.')
+        return redirect (url_for ("ingresar"))
+
+
+@app.route('/search/clientes/country', methods=['GET', 'POST'])
+def porPaís():
+    if 'username' in session:
+        formulario = SearchCountry()
+        if formulario.validate_on_submit():
+            newlist = processing.searchCountry(formulario.search.data)
+            if newlist == []:
+                return render_template('porPaís.html', formulario=formulario, mensaje = "No se encontraron resultados")
+            else:
+                return render_template('porPaís.html', formulario=formulario, newlist = newlist)
+        return render_template('porPaís.html', formulario=formulario)
+    else:
+        flash('Primero debes ingresar.')
+        return redirect (url_for ("ingresar"))
+
+
+@app.route('/search/clientes/country/<pais>')
+def resultadoPorPaís(pais):
+    if 'username' in session:
+        filas = processing.rowsCountry(pais)
+        CantClientes = processing.contar(filas)
+        encabezados = processing.createHeaders()
+        return render_template('clientes.html', filas = filas, CantClientes = CantClientes, encabezados = encabezados)
+    else:
+        flash('Primero debes ingresar.')
+        return redirect (url_for ("ingresar"))
+    
 
 @app.errorhandler(404)
 def no_encontrado(e):
